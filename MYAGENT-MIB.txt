@@ -1,0 +1,87 @@
+MYAGENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, enterprises
+        FROM SNMPv2-SMI
+    DisplayString, DateAndTime
+        FROM SNMPv2-TC;
+
+myAgentMIB MODULE-IDENTITY
+    LAST-UPDATED "20251104Z"             
+    ORGANIZATION "Zaragoza Network Management Research Group"
+    CONTACT-INFO
+        "Student: <CarlayArancha>
+         Email: <880156@unizar.es>"
+    DESCRIPTION
+        "MIB para un mini agente SNMP que monitoriza el uso de CPU
+         y envía una notificación cuando el uso supera un umbral definido."
+    REVISION "20251104Z"
+    DESCRIPTION
+        "Versión inicial del MIB para el agente con notificación y envío de correo."
+    ::= { enterprises 28308 }              
+
+--
+-- Estructura de objetos
+--
+
+myAgentObjects      OBJECT IDENTIFIER ::= { myAgentMIB 1 }
+myAgentNotifications OBJECT IDENTIFIER ::= { myAgentMIB 2 }
+
+--
+-- Objetos gestionados
+--
+
+manager OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Nombre del administrador de red responsable del agente."
+    ::= { myAgentObjects 1 }
+
+managerEmail OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (5..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Correo electrónico del administrador que recibirá las notificaciones."
+    ::= { myAgentObjects 2 }
+
+cpuUsage OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Porcentaje actual de uso de CPU del sistema (0-100%)."
+    ::= { myAgentObjects 3 }
+
+cpuThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Umbral configurado de uso de CPU (%). Si cpuUsage excede este valor,
+         se genera una notificación."
+    ::= { myAgentObjects 4 }
+
+eventTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Marca de tiempo del momento en que se detectó la CPU por encima del umbral."
+    ::= { myAgentObjects 5 }
+
+--
+-- Notificación (trap)
+--
+
+cpuOverThresholdNotification NOTIFICATION-TYPE
+    OBJECTS { cpuUsage, cpuThreshold, managerEmail, eventTime }
+    STATUS  current
+    DESCRIPTION
+        "Notificación generada cuando el uso de CPU supera el umbral definido.
+         Incluye los valores actuales de cpuUsage, cpuThreshold, managerEmail y la hora del evento."
+    ::= { myAgentNotifications 1 }
+
+END
