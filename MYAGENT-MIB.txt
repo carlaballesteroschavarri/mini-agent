@@ -10,7 +10,7 @@ myAgentMIB MODULE-IDENTITY
     LAST-UPDATED "20251104Z"             
     ORGANIZATION "Zaragoza Network Management Research Group"
     CONTACT-INFO
-        "Student: <CarlayArancha>
+        "Student: <CarlaAranchaImene>
          Email: <880156@unizar.es>"
     DESCRIPTION
         "MIB para un mini agente SNMP que monitoriza el uso de CPU
@@ -83,5 +83,6 @@ cpuOverThresholdNotification NOTIFICATION-TYPE
         "Notificación generada cuando el uso de CPU supera el umbral definido.
          Incluye los valores actuales de cpuUsage, cpuThreshold, managerEmail y la hora del evento."
     ::= { myAgentNotifications 1 }
+
 
 END
