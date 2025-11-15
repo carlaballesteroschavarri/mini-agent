@@ -20,9 +20,9 @@ La práctica integra modelado MIB, programación con pysnmp, y manejo real de no
 
 Estructura del proyecto 
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-snmp_agent/......
+snmp_agent/..............................................................................................................................................
                 │                                                                                                                                                  
-                ├── mini_agent.py              # Agente SNMP principal 
+   .............................             ├── mini_agent.py              # Agente SNMP principal 
                 ├── mib_state.json             # Estado persistente de los objetos
                 ├── MYAGENT-MIB.txt            # MIB personalizada
                 ├── pruebas.py               # Script de pruebas SNMP (opcional)
