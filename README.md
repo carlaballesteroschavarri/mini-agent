@@ -126,7 +126,7 @@ snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 s "bad-type" <br>
 snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 i 200 <br>
 7. SET sobre OID inexistente <br>
 snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.99.0 i 10 <br>
-8. GETNEX <br>
+8. GETNEXT <br>
 snmpgetnext -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.1.0 <br>
 9. SNMPWALK <br>
 snmpwalk -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1 <br>
