@@ -40,11 +40,11 @@ Configuración
 _Requisitos:_
 Python 
 
-_Librerías necesarias a instalar:_
-- pysnmp: manejo del PDU
-- psutil: lectura del uso de CPU
-- asyncio: concurrencia asíncrona y tarea periódica
-- smtplib: envío gmail
+_Librerías necesarias a instalar:_ <br>
+pysnmp: manejo del PDU <br>
+psutil: lectura del uso de CPU <br>
+asyncio: concurrencia asíncrona y tarea periódica <br>
+smtplib: envío gmail
 
 
 Ejecución del agente SNMP
@@ -54,9 +54,9 @@ _Comunidades de acceso:_
 - public (solo lectura)
 - private (lectura y escritura)
 
-_Direcciones:_
-- Agente está configurado para escuchar en el puerto UDP 1161
-- Envía traps al destino por defecto 127.0.0.1:162
+_Direcciones:_ <br>
+Agente está configurado para escuchar en el puerto UDP 1161<br>
+Envía traps al destino por defecto 127.0.0.1:162
 
 Al iniciarse, el agente crea (si no existe) el archivo mib_state.json con los valores por defecto y va guardando su estado en ese archivo: 
 ```text
@@ -104,44 +104,37 @@ Todos los valores de las variables RW (manager, managerEmail, cpuThreshold) se a
 
 Pruebas SNMP (con herramientas snmp):
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Asumiendo que el agente se ejecuta en 127.0.0.1:1161
+Asumiendo que el agente se ejecuta en 127.0.0.1:1161. A continuación se muestran todos los comandos que se llevan a cabo durante la ejecución del archivo pruebas.py.
 
-🔹 Lectura (GET / GETNEXT / WALK) <br>
-Obtener nombre del manager<br>
-snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.1.0
-
-Obtener uso de CPU <br>
-snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.3.0
-
-Recorrer toda la tabla (WALK) <br>
-snmpwalk -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1
-
-🔹 Escritura (SET) <br>
+1. GET de todos los scalars con comunidad public <br>
+snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.1.0 <br>
+snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.2.0 <br>
+snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.3.0 <br>
+snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 <br>
+snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.5.0 <br>
+2. SET con public<br>
+snmpset -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.1.0 s "NoDeberia" <br>
+3. SET válidos con private <br>
+snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.1.0 s "CarlayArancha" <br>
 snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.2.0 s "carla.ballesteros64@gmail.com" <br>
-snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 i 75
+snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 i 50 <br>
+4. SET sobre variable de solo lectura <br>
+snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.3.0 i 10 <br>
+5. SET con tipo incorrecto <br>
+snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 s "bad-type" <br>
+6. SET con valor fuera de rango (>100) <br>
+snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 i 200 <br>
+7. SET sobre OID inexistente <br>
+snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.99.0 i 10 <br>
+8. GETNEX <br>
+snmpgetnext -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.1.0 <br>
+9. SNMPWALK <br>
+snmpwalk -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1 <br>
+10. En la parte de alerta, un SET adicional para forzar trap y correo <br>
+snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 i 0 <br>
+11. Restaurar el cpuThreshold original <br>
+snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 i 20 <br>
 
-🔹 Prueba de Persistencia
-
-    - Cambia un valor RW.
-    - Detén y vuelve a iniciar el agente.
-    - Comprueba que el cambio se ha conservado en mib_state.json.
-
-🔹 Prueba de Notificación (TRAP + EMAIL)
-
-   1.Configura un umbral bajo (ej. 10%): <br>
-    snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 i 10
-
-   2.Observa en la consola del agente: <br>
-    [TRAP] CPU=45% > 10% - Trap enviado <br>
-    [EMAIL] Correo enviado correctamente a xxxxx <br>
-
-  3. Comprobar en la aplicación de correo que el mensaje llega
-
-⚠️ Pruebas Negativas (Validación de Errores) <br>
-SET a variable RO	snmpset ... cpuUsage i 50	notWritable	17 <br>
-Tipo incorrecto	snmpset ... cpuThreshold s "abc"	wrongType	7 <br>
-Valor fuera de rango	snmpset ... cpuThreshold i 200	wrongValue	10 <br>
-OID inexistente	snmpset ... 1.3.6.1.99.0 s "test" <br>
 
 Autores:
 -------------------------------------------------------------------------
