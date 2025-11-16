@@ -40,10 +40,10 @@ Funcionalidades:
 
 Configuración
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-Requisitos:
+_Requisitos:_
 Python 
 
-Librerías necesarias:
+_Librerías necesarias:_
 - pysnmp: manejo del PDU
 - psutil: Lectura del uso de CPU
 - asyncio: Concurrencia asíncrona y tarea periódica
@@ -55,7 +55,7 @@ pip install pysnmp psutil asyncio
 
 pip install secure-smtplib
 
-Comunidades de acceso:
+_Comunidades de acceso:_
 - public (solo lectura)
 - private (lectura y escritura)
 
@@ -74,20 +74,20 @@ DEFAULT_STORE = {
 }
 ```
 
-Configuración de Email: <br>
+_Configuración de Email:_ <br>
 El envío del correo electrónico requiere que ENABLE_EMAIL esté en True. <br>
 La configuración actual utiliza credenciales de Gmail y el puerto 465 SSL. <br>
 El código implementa una función send_email_gmail que utiliza la biblioteca smtplib. <br>
 Se debe utilizar una cuenta de correo con contraseña de aplicación (App password) si se utiliza Gmail, ya que el código contiene un nombre de usuario (GMAIL_USER) y una contraseña (GMAIL_APP_PASS)
 
-Para iniciar el agente: <br>
+_Para iniciar el agente:_ <br>
 python mini_agent.py <br>
 Agente imprimirá: <br>
 Mini SNMP Agent (pysnmp 7.1.4) <br>
 Escuchando en UDP/1161 (comunidades: public/private)
 
 
-_Objetos de Gestión (MIB)_ <br>
+_Objetos de Gestión (MIB):_ <br>
 ```text
 OID base: 1.3.6.1.4.1.28308.1 <br>
     Manager:      .1.1.0 RW (nombre del administrador) <br>
@@ -99,11 +99,11 @@ OID base: 1.3.6.1.4.1.28308.1 <br>
 Funcionamiento interno:
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 1. Monitoreo periódico:
-Cada 5 segundos, el agente mide el uso de CPU con psutil y actualiza el objeto cpuUsage
+Cada 5 segundos, el agente mide el uso de CPU con psutil y actualiza el objeto cpuUsage. A su vez, escucha peticiones SNMP y ejecuta la función de respuesta correspondiente.
 2. Superación de umbral:
-Si cpuUsage > cpuThreshold, el agente:
-    Envía un TRAP SNMPv2c al destino configurado (por defecto localhost:162).
-    Envía un correo HTML con los detalles del evento.
+Si cpuUsage > cpuThreshold, el agente: <br>
+    Envía un TRAP SNMPv2c al destino configurado (por defecto localhost:162). <br>
+    Envía un correo HTML con los detalles del evento. <br>
 3. Persistencia:
 Todos los valores de las variables RW (manager, managerEmail, cpuThreshold) se almacenan en mib_state.json para conservar su estado entre ejecuciones.
 
@@ -111,46 +111,44 @@ Pruebas SNMP (con herramientas snmp):
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Asumiendo que el agente se ejecuta en 127.0.0.1:1161
 
-🔹 Lectura (GET / GETNEXT / WALK)
-Obtener nombre del manager
+🔹 Lectura (GET / GETNEXT / WALK) <br>
+Obtener nombre del manager<br>
 snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.1.0
 
-Obtener uso de CPU
+Obtener uso de CPU <br>
 snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.3.0
 
-Recorrer toda la tabla (WALK)
+Recorrer toda la tabla (WALK) <br>
 snmpwalk -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1
 
-🔹 Escritura (SET)
-snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.2.0 s "carla.ballesteros64@gmail.com"
+🔹 Escritura (SET) <br>
+snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.2.0 s "carla.ballesteros64@gmail.com" <br>
 snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 i 75
 
 🔹 Prueba de Persistencia
 
     - Cambia un valor RW.
-
     - Detén y vuelve a iniciar el agente.
-
     - Comprueba que el cambio se ha conservado en mib_state.json.
 
 🔹 Prueba de Notificación (TRAP + EMAIL)
 
-   1.Configura un umbral bajo (ej. 10%):
+   1.Configura un umbral bajo (ej. 10%): <br>
     snmpset -v2c -c private 127.0.0.1:1161 1.3.6.1.4.1.28308.1.4.0 i 10
 
-   2.Observa en la consola del agente:
-    [TRAP] CPU=45% > 10% - Trap enviado 
-    [EMAIL] Correo enviado correctamente a xxxxx
+   2.Observa en la consola del agente: <br>
+    [TRAP] CPU=45% > 10% - Trap enviado <br>
+    [EMAIL] Correo enviado correctamente a xxxxx <br>
 
   3. Comprobar en la aplicación de correo que el mensaje llega
 
-⚠️ Pruebas Negativas (Validación de Errores)
-SET a variable RO	snmpset ... cpuUsage i 50	notWritable	17
-Tipo incorrecto	snmpset ... cpuThreshold s "abc"	wrongType	7
-Valor fuera de rango	snmpset ... cpuThreshold i 200	wrongValue	10
-OID inexistente	snmpset ... 1.3.6.1.99.0 s "test"
+⚠️ Pruebas Negativas (Validación de Errores) <br>
+SET a variable RO	snmpset ... cpuUsage i 50	notWritable	17 <br>
+Tipo incorrecto	snmpset ... cpuThreshold s "abc"	wrongType	7 <br>
+Valor fuera de rango	snmpset ... cpuThreshold i 200	wrongValue	10 <br>
+OID inexistente	snmpset ... 1.3.6.1.99.0 s "test" <br>
 
 Autores:
 -------------------------------------------------------------------------
-Proyecto desarrollado para la asignatura GESTIÓN DE RED (25/26).
+Proyecto desarrollado para la asignatura GESTIÓN DE RED (25/26). <br>
 Desarrollado por: Aranzazu Araguás Calvo, Carla Ballesteros Chavarri e Imene Mouri
