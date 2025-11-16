@@ -20,6 +20,8 @@ La práctica integra modelado MIB, programación con pysnmp, y manejo real de no
 
 Estructura del proyecto 
 ----------------------------------------------------------------------------------------------------------------------------------------------------
+
+```text
 snmp_agent/
                 │                                                                                                                                                  
                 ├── mini_agent.py              # Agente SNMP principal 
@@ -104,13 +106,13 @@ Pruebas SNMP (con herramientas snmp):
 Asumiendo que el agente se ejecuta en 127.0.0.1:1161
 
 🔹 Lectura (GET / GETNEXT / WALK)
-# Obtener nombre del manager
+Obtener nombre del manager
 snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.1.0
 
-# Obtener uso de CPU
+Obtener uso de CPU
 snmpget -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1.3.0
 
-# Recorrer toda la tabla (WALK)
+Recorrer toda la tabla (WALK)
 snmpwalk -v2c -c public 127.0.0.1:1161 1.3.6.1.4.1.28308.1
 
 🔹 Escritura (SET)
