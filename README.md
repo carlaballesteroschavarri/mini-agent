@@ -40,23 +40,21 @@ Configuración
 _Requisitos:_
 Python 
 
-_Librerías necesarias:_
+_Librerías necesarias a instalar:_
 - pysnmp: manejo del PDU
-- psutil: Lectura del uso de CPU
-- asyncio: Concurrencia asíncrona y tarea periódica
+- psutil: lectura del uso de CPU
+- asyncio: concurrencia asíncrona y tarea periódica
+- smtplib: envío gmail
 
 
 Ejecución del agente SNMP
 -----------------------------------------------------------------------------------------------------------------------------------------------------
-pip install pysnmp psutil asyncio
-
-pip install secure-smtplib
 
 _Comunidades de acceso:_
 - public (solo lectura)
 - private (lectura y escritura)
 
-Por defecto:
+_Direcciones:_
 - Agente está configurado para escuchar en el puerto UDP 1161
 - Envía traps al destino por defecto 127.0.0.1:162
 
