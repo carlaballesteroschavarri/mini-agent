@@ -32,11 +32,11 @@ snmp_agent/
 ```
 Funcionalidades: 
 ----------------------------------------------------------------------------------------------------------------------------------------------------
-Modelo de información (MIB personalizada): Implementa objetos escalares bajo el grupo myAgentGroup con tipos DisplayString, Integer32 y DateandTime
-Los comandos SNMP: tienen soporte para GET, GETNEXT y SET en los objetos de gestión
-Monitoreo asíncrono: actualiza el valor de CPUUsage cada 5 segundos utilizando psutil dentro de una tarea asyncio
-Notificación inteligente: envío de un TRAP SNMPv2c y un correo electrónico cuando cpuUsage supera cpuThreshold
-Gestión de email: envía alertas al correo del administrador (managerEmail) usando smtplib con servidor Gmail y SSL
+- Modelo de información (MIB personalizada): Implementa objetos escalares bajo el grupo myAgentGroup con tipos DisplayString, Integer32 y DateandTime
+- Los comandos SNMP: tienen soporte para GET, GETNEXT y SET en los objetos de gestión
+- Monitoreo asíncrono: actualiza el valor de CPUUsage cada 5 segundos utilizando psutil dentro de una tarea asyncio
+- Notificación inteligente: envío de un TRAP SNMPv2c y un correo electrónico cuando cpuUsage supera cpuThreshold
+- Gestión de email: envía alertas al correo del administrador (managerEmail) usando smtplib con servidor Gmail y SSL
 
 Configuración
 ----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,16 +52,19 @@ Librerías necesarias:
 Ejecución del agente SNMP
 -----------------------------------------------------------------------------------------------------------------------------------------------------
 pip install pysnmp psutil asyncio
+
 pip install secure-smtplib
 
 Comunidades de acceso:
--public (solo lectura)
--private (lectura y escritura)
+- public (solo lectura)
+- private (lectura y escritura)
 
 Por defecto:
-Agente está configurado para escuchar en el puerto UDP 1161
-Envía traps al destino por defecto 127.0.0.1:162
-Al iniciarse, el agente crea (Si no existe) el archivo mib_state.json con los valores por defecto: 
+- Agente está configurado para escuchar en el puerto UDP 1161
+- Envía traps al destino por defecto 127.0.0.1:162
+
+Al iniciarse, el agente crea (si no existe) el archivo mib_state.json con los valores por defecto y va guardando su estado en ese archivo: 
+```text
 DEFAULT_STORE = {
     "1.3.6.1.4.1.28308.1.1.0": ("DisplayString", "Admin"),
     "1.3.6.1.4.1.28308.1.2.0": ("DisplayString", "perezarancha28@gmail.com"),
@@ -69,27 +72,30 @@ DEFAULT_STORE = {
     "1.3.6.1.4.1.28308.1.4.0": ("Integer32", 20),
     "1.3.6.1.4.1.28308.1.5.0": ("DateAndTime", ""),
 }
-y va guardando su estado (valores escalares) en ese archivo
+```
 
-Configuración de Email:
-El envío del correo electrónico requiere que ENABLE_EMAIL esté en True. La configuración actual utiliza credenciales de Gmail y el puerto 465 SSL. El código implementa una función send_email_gmail que utiliza la biblioteca smtplib.
+Configuración de Email: <br>
+El envío del correo electrónico requiere que ENABLE_EMAIL esté en True. <br>
+La configuración actual utiliza credenciales de Gmail y el puerto 465 SSL. <br>
+El código implementa una función send_email_gmail que utiliza la biblioteca smtplib. <br>
 Se debe utilizar una cuenta de correo con contraseña de aplicación (App password) si se utiliza Gmail, ya que el código contiene un nombre de usuario (GMAIL_USER) y una contraseña (GMAIL_APP_PASS)
 
-Para iniciar el agente:
-python mini_agent.py
-Agente imprimirá: 
-Mini SNMP Agent (pysnmp 7.1.4)
+Para iniciar el agente: <br>
+python mini_agent.py <br>
+Agente imprimirá: <br>
+Mini SNMP Agent (pysnmp 7.1.4) <br>
 Escuchando en UDP/1161 (comunidades: public/private)
 
 
-Objetos de Gestión (MIB)
-- OID base: 1.3.6.1.4.1.28308.1
-    Manager:      .1.1.0 RW (nombre del administrador)
-    ManagerEmail: .1.2.0 RW (Correo del administrador)
-    cpuUsage:     .1.3.0 RO (Uso actual de CPU)
-    cpuThreshold: .1.4.0 RW (Umbral de alerta de CPU)
-    eventTime:    .1.5.0 RO (Fecha/hora del último evento)
-
+_Objetos de Gestión (MIB)_ <br>
+```text
+OID base: 1.3.6.1.4.1.28308.1 <br>
+    Manager:      .1.1.0 RW (nombre del administrador) <br>
+    ManagerEmail: .1.2.0 RW (Correo del administrador) <br>
+    cpuUsage:     .1.3.0 RO (Uso actual de CPU) <br>
+    cpuThreshold: .1.4.0 RW (Umbral de alerta de CPU) <br>
+    eventTime:    .1.5.0 RO (Fecha/hora del último evento) <br>
+```
 Funcionamiento interno:
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 1. Monitoreo periódico:
