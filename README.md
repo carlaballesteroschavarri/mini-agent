@@ -29,7 +29,7 @@ snmp_agent/
                 ├── MYAGENT-MIB.txt            # MIB personalizada
                 ├── pruebas.py                 # Script de pruebas SNMP 
                 └── README.md                  # Documentación del proyecto
-
+```
 Funcionalidades: 
 ----------------------------------------------------------------------------------------------------------------------------------------------------
 Modelo de información (MIB personalizada): Implementa objetos escalares bajo el grupo myAgentGroup con tipos DisplayString, Integer32 y DateandTime
